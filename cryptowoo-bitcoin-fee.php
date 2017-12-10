@@ -4,14 +4,15 @@
  * Plugin URI:
  * Description: Add Bitcoin transaction fee to order total. Requires CryptoWoo main plugin.
  * Version: 0.1.0
- * Author: Olsm|OlavOlsm|Keys4Coins
+ * Author: Olav Småriset
  * Author URI: https://www.keys4coins.com
  * License: GPLv2
  * WC tested up to: 3.2.5
  */
 
-add_action( 'woocommerce_cart_calculate_fees', 'wc_add_surcharge' );// Options page
+add_action( 'woocommerce_cart_calculate_fees', 'wc_add_surcharge' );
 add_action( 'plugins_loaded', 'cwbf_add_fields', 10 );
+add_action( 'wp_enqueue_scripts', 'enqueue_scripts' );
 
 function wc_add_surcharge() {
 	global $woocommerce;
@@ -68,6 +69,19 @@ function satoshi_to_usd( $satoshi ) {
 	}
 
 	return $btc * $btc_usd;
+}
+
+/**
+ * Register and enqueues public-facing JavaScript files.
+ */
+function enqueue_scripts() {
+	if ( is_checkout() ) {
+		wp_enqueue_script( 'cryptowoo-bitcoin-fee',
+			plugins_url( 'js/update-checkout.js', __FILE__ ),
+			[ 'wc-checkout' ],
+			1
+		);
+	}
 }
 
 /**
