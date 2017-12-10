@@ -20,6 +20,11 @@ function wc_add_surcharge() {
 		return;
 	}
 
+	// Make sure the chosen payment method is cryptowoo
+	if (WC()->session->chosen_payment_method != "cryptowoo") {
+		return;
+	}
+
 	// Option for tx fees (speed of forwarding tx)
 	$fee_option = "hourFee";
 	$option     = get_option( "cryptowoo_payments" );
