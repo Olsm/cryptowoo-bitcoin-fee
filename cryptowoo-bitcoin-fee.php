@@ -15,9 +15,9 @@ add_action( 'plugins_loaded', 'cwbf_add_fields', 10 );
 add_action( 'wp_enqueue_scripts', 'enqueue_scripts' );
 
 function wc_add_surcharge() {
-	global $woocommerce;
 
-	if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+	// Make sure we are on the update_order_review or checkout calls
+	if ( !isset($_REQUEST["wc-ajax"]) ) {
 		return;
 	}
 
@@ -25,6 +25,11 @@ function wc_add_surcharge() {
 	if (WC()->session->chosen_payment_method != "cryptowoo") {
 		return;
 	}
+
+	// Return if payment currency is not btc to not add fee
+	$payment_currency = get_payment_currency_from_request();
+	if ($payment_currency != "BTC") return;
+
 
 	// Option for tx fees (speed of forwarding tx)
 	$fee_option = "hourFee";
@@ -37,7 +42,7 @@ function wc_add_surcharge() {
 		$fee_satoshi  = get_recommended_bitcoin_fee( $fee_option );
 		$fee_per_byte = satoshi_to_usd( $fee_satoshi );
 		$fee          = $fee_per_byte * 226;
-		$woocommerce->cart->add_fee( 'Surcharge (Bitcoin transaction fee)', $fee, true, 'standard' );
+		WC()->cart->add_fee( 'Surcharge (Bitcoin transaction fee)', $fee, true, 'standard' );
 	} catch ( Exception $e ) {
 		// ToDo: log error message
 		// ToDo: Show error to customer and disable checkout button
@@ -71,6 +76,32 @@ function satoshi_to_usd( $satoshi ) {
 	return $btc * $btc_usd;
 }
 
+function get_payment_currency_from_request() {
+	// Get the post data (all data in checkout form)
+	$post_data = [];
+	if ($_REQUEST["wc-ajax"] == "update_order_review") {
+		if (!isset($_POST["post_data"])) {
+			// ToDo: Log error
+			return false;
+		}
+		parse_str($_POST["post_data"], $post_data);
+
+	} else if ($_REQUEST["wc-ajax"] == "checkout") {
+		$post_data = $_POST;
+	} else {
+		// ToDo: Log error
+		return false;
+	}
+
+	// Make sure payment currency exist in post data
+	if (!isset($post_data["payment_currency"])) {
+		// ToDo: Log error
+		return false;
+	}
+
+	return $post_data["payment_currency"];;
+}
+
 /**
  * Register and enqueues public-facing JavaScript files.
  */
@@ -79,7 +110,7 @@ function enqueue_scripts() {
 		wp_enqueue_script( 'cryptowoo-bitcoin-fee',
 			plugins_url( 'js/update-checkout.js', __FILE__ ),
 			[ 'wc-checkout' ],
-			1
+			time()
 		);
 	}
 }
