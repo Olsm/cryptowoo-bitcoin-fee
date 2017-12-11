@@ -1,5 +1,5 @@
 # CryptoWoo Bitcoin Fee
-Add Bitcoin transaction fee to order total. Requires CryptoWoo main plugin.
+Add Bitcoin transaction fee to order total.
 
 ## Requirements
 [WordPress](https://wordpress.org/download/)  
