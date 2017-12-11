@@ -1,13 +1,17 @@
 <?php
 /**
  * Plugin Name: CryptoWoo Bitcoin Fee
- * Plugin URI:
+ * Plugin URI: https://github.com/Olsm/cryptowoo-bitcoin-fee
+ * GitHub Plugin URI: Olsm/cryptowoo-bitcoin-fee
  * Description: Add Bitcoin transaction fee to order total. Requires CryptoWoo main plugin.
- * Version: 0.1.0
+ * Version: 1.0
  * Author: Olav Småriset
- * Author URI: https://www.keys4coins.com
+ * Author URI: https://github.com/Olsm
  * License: GPLv2
+ * Text Domain: cryptowoo-bch-addon
+ * Domain Path: /lang
  * WC tested up to: 3.2.5
+ *
  */
 
 add_action( 'woocommerce_cart_calculate_fees', 'wc_add_surcharge' );
