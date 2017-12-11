@@ -114,7 +114,7 @@ function enqueue_scripts() {
 		wp_enqueue_script( 'cryptowoo-bitcoin-fee',
 			plugins_url( 'js/update-checkout.js', __FILE__ ),
 			[ 'wc-checkout' ],
-			time()
+			1
 		);
 	}
 }
